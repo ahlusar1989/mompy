@@ -9,5 +9,6 @@ from . import solvers as solvers
 from . import extractors as extractors
 from .solvers import cvxsolvers
 from .core import problem_to_str
+from . import util as util
 
 
