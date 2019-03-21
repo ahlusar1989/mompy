@@ -36,13 +36,13 @@ def extract_solutions_lasserre(MM, ys, Kmax=10, tol=1e-6, maxdeg = None):
     T,Ut = util.srref(Vs[0:count,:])
     
     if Sigma[count] <= tol:
-        print 'lost %.7f' % Sigma[count]
+        print('lost %.7f' % Sigma[count])
     # inplace!
     util.row_normalize_leadingone(Ut)
 
     couldbes = np.where(Ut>0.9)
     ind_leadones = np.zeros(Ut.shape[0], dtype=np.int)
-    for j in reversed(range(len(couldbes[0]))):
+    for j in reversed(list(range(len(couldbes[0])))):
         ind_leadones[couldbes[0][j]] = couldbes[1][j]
 
     basis = [MM.row_monos[i] for i in ind_leadones]
@@ -88,13 +88,13 @@ def extract_solutions_lasserre_average(MM, ys, Kmax=10, tol=1e-6, numiter=10):
         T,Ut = util.srref(M[0:count,:])
         
         if Sigma[count] <= tol:
-            print 'lost %.7f' % Sigma[count]
+            print('lost %.7f' % Sigma[count])
         # inplace!
         util.row_normalize_leadingone(Ut)
 
         couldbes = np.where(Ut>0.9)
         ind_leadones = np.zeros(Ut.shape[0], dtype=np.int)
-        for j in reversed(range(len(couldbes[0]))):
+        for j in reversed(list(range(len(couldbes[0])))):
             ind_leadones[couldbes[0][j]] = couldbes[1][j]
 
         basis = [MM.row_monos[i] for i in ind_leadones]
@@ -130,7 +130,7 @@ def extract_solutions_dreesen_proto(MM, ys, Kmax=10, tol=1e-5):
     
     count = min(Kmax,sum(Sigma>tol))
     Z = Us[:,0:count]
-    print 'the next biggest eigenvalue we are losing is %f' % Sigma[count]
+    print('the next biggest eigenvalue we are losing is %f' % Sigma[count])
 
     dict_row_monos = dict_mono_to_ind(MM.row_monos)
     
@@ -172,7 +172,7 @@ def extract_solutions_dreesen(MM, ys, Kmax=10, tol=1e-5):
     
     count = min(Kmax,sum(Sigma>tol))
     Z = Us[:,0:count]
-    print 'the next biggest eigenvalue we are losing is %f' % Sigma[count]
+    print('the next biggest eigenvalue we are losing is %f' % Sigma[count])
 
     dict_row_monos = dict_mono_to_ind(MM.row_monos)
     
@@ -204,7 +204,7 @@ def extract_solutions_dreesen(MM, ys, Kmax=10, tol=1e-5):
     Sgs = np.zeros( (len(MM.row_monos)*len(MM.vars), len(MM.row_monos)) )
 
     r = 0
-    for i in xrange(len(S1list)):
+    for i in range(len(S1list)):
         S1i = S1list[i]
         Sgi = Sglist[i]
         numrow = S1i.shape[0]
@@ -233,15 +233,15 @@ def extract_solutions_dreesen(MM, ys, Kmax=10, tol=1e-5):
 
 def test_solution_extractors():
     import sympy as sp
-    import core as core
+    from . import core as core
     x = sp.symbols('x')
     M = core.MomentMatrix(2, [x], morder='grevlex')
     ys = [1, 1.5, 2.5, 4.5, 8.5]
     sols_lass = extract_solutions_lasserre(M, ys)
 
     sols_dree = extract_solutions_dreesen(M, ys)
-    print sols_lass, sols_dree
-    print 'true values are 1 and 2'
+    print(sols_lass, sols_dree)
+    print('true values are 1 and 2')
     
 if __name__ == "__main__":
     test_solution_extractors()

@@ -27,7 +27,7 @@ EPS = 1e-7
 
 class Measure(object):
     def __init__():
-        print 'measure'
+        print('measure')
         
 class MomentMatrix(object):
     """
@@ -160,7 +160,7 @@ class MomentMatrix(object):
         print the moment matrix in a nice format?
         """
         for i,mono in enumerate(self.matrix_monos):
-            print '%s:\t%f\t' % (str(mono), sol['x'][i])
+            print('%s:\t%f\t' % (str(mono), sol['x'][i]))
 
 
 class LocalizingMatrix(object):
@@ -222,7 +222,7 @@ class LocalizingMatrix(object):
 if __name__=='__main__':
     # simple test to make sure things run
     from cvxopt import solvers
-    print 'testing simple unimixture with a skipped observation, just to test that things run'
+    print('testing simple unimixture with a skipped observation, just to test that things run')
     x = sp.symbols('x')
     M = MomentMatrix(3, [x], morder='grevlex')
     constrs = [x-1.5, x**2-2.5, x**4-8.5]

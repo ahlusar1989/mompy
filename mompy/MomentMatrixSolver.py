@@ -30,7 +30,7 @@ def convex_projection_solver(M, constraints, rank=2, tau=1, delta = 0.1, maxiter
     weightone = 1
     A = A*weightone; b = b*weightone
     X = np.random.randn(rowsM, rowsM)
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         yX = Bf.dot(X.flatten()[:, np.newaxis])/np.sum(Bf,1)[:,np.newaxis]
 
         yproj = util.project_nullspace(A,b,yX, randomize =0)
@@ -43,7 +43,7 @@ def convex_projection_solver(M, constraints, rank=2, tau=1, delta = 0.1, maxiter
         D = np.fmax(D - tau, 0)
         X = U.dot(np.diag(D)).dot(V)
         objprojL = scipy.linalg.norm(X - M.numeric_instance(y)) + scipy.linalg.norm(A.dot(y)-b)
-        print '%d:\t%f\t%f' % (i, objyconstrs, objprojL)
+        print('%d:\t%f\t%f' % (i, objyconstrs, objprojL))
         if objprojL < tol:
             break
     return y,X
@@ -67,7 +67,7 @@ def projection_solver(M, constraints, rank=2, maxiter=100, tol=1e-6):
     weightone = 1
     A = A*weightone; b = b*weightone
     
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         yL = Bf.dot(L.T.dot(L).flatten()[:, np.newaxis])/np.sum(Bf,1)[:,np.newaxis]
         y = util.project_nullspace(A,b,yL, randomize =0/np.sqrt(i+100))
         My = M.numeric_instance(y)
@@ -78,7 +78,7 @@ def projection_solver(M, constraints, rank=2, maxiter=100, tol=1e-6):
         L = V[0:rank,:]*np.sqrt(D[0:rank, np.newaxis])
         
         objprojL = scipy.linalg.norm(L.T.dot(L) - M.numeric_instance(y)) + scipy.linalg.norm(A.dot(y)-b)
-        print '%d:\t%f\t%f' % (i, objyconstrs, objprojL)
+        print('%d:\t%f\t%f' % (i, objyconstrs, objprojL))
         if objprojL < tol:
             break
     return y,L
@@ -103,7 +103,7 @@ def joint_alternating_solver(M, constraints, rank=2, maxiter=100, tol=1e-3):
     consts[-lenys:] = A.T.dot(b)
     coeffs = np.zeros((lenLs+lenys,lenLs+lenys))
 
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         smallblock = L.dot(L.T)
         dy_L = -Bf.dot(np.kron(np.eye(rowsM), L.T))
         dy_y = A.T.dot(A) + Bf.dot(Bf.T)
@@ -125,7 +125,7 @@ def joint_alternating_solver(M, constraints, rank=2, maxiter=100, tol=1e-3):
         # L = L / scipy.linalg.norm(L[:,0])
         y = sol[-lenys:]
         obj = scipy.linalg.norm(L.T.dot(L) - M.numeric_instance(y)) + scipy.linalg.norm(A.dot(y)-b)
-        print obj
+        print(obj)
     ipdb.set_trace()
     # need to know which matrix_mono is in each location
 
@@ -151,7 +151,7 @@ def sgd_solver(M, constraints, rank=2, maxiter=100, eta = 1):
     Ly[0:lenLs] = L.T.flatten()[:,np.newaxis]
     Ly[lenLs:] = np.random.randn(lenys, 1)
 
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         smallblock = L.dot(L.T)
         dy_L = -Bf.dot(np.kron(np.eye(rowsM), L.T))
         dy_y = A.T.dot(A) + Bf.dot(Bf.T)
@@ -170,7 +170,7 @@ def sgd_solver(M, constraints, rank=2, maxiter=100, eta = 1):
         L = Ly[0:lenLs].reshape((rowsM, rank)).T
         
         obj = scipy.linalg.norm(L.T.dot(L) - M.numeric_instance(y))**2 + scipy.linalg.norm(A.dot(y)-b)**2
-        print obj
+        print(obj)
     ipdb.set_trace()
     # need to know which matrix_mono is in each location
 
@@ -191,7 +191,7 @@ def alternating_sgd_solver(M, constraints, rank=2, maxiter=100, tol=1e-3, eta = 
     
     counts = [len(M.term_to_indices_dict[yi]) for yi in M.matrix_monos[1:]]
     weight_fit = 1;
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         # update y
         Q_y = A.T.dot(A) + weight_fit*np.diag(counts)
         currentM = La.T.dot(La)
@@ -209,7 +209,7 @@ def alternating_sgd_solver(M, constraints, rank=2, maxiter=100, tol=1e-3, eta = 
         La = La - eta*grad
         if i % 50 == 0:
             obj = scipy.linalg.norm(La.T.dot(La) - M.numeric_instance(y_one))**2 + scipy.linalg.norm(A.dot(y)-b)**2
-            print i,obj
+            print(i,obj)
 
     return y,La
 
@@ -230,7 +230,7 @@ def alternating_solver(M, constraints, rank=2, maxiter=100, tol=1e-3, eta=0.001)
     
     counts = [len(M.term_to_indices_dict[yi]) for yi in M.matrix_monos[1:]]
     weight_fit = 1;
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         # update y
         Q_y = A.T.dot(A) + weight_fit*np.diag(counts)
         currentM = La.T.dot(La)
@@ -254,7 +254,7 @@ def alternating_solver(M, constraints, rank=2, maxiter=100, tol=1e-3, eta=0.001)
         La = V[0:rank,:]*np.sqrt(D[0:rank, np.newaxis])
         if i % 50 == 0:
             obj = scipy.linalg.norm(La.T.dot(La) - M.numeric_instance(y_one))**2 + scipy.linalg.norm(A.dot(y)-b)**2
-            print i,obj
+            print(i,obj)
 
     return y,La
     # need to know which matrix_mono is in each location

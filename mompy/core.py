@@ -79,12 +79,12 @@ class Measure(object):
     def integrate(self, expr):
         integral = 0.0
         for i,w in enumerate(self.weights):
-            integral += w* expr.subs(zip(self.vars, self.atoms[i]))
+            integral += w* expr.subs(list(zip(self.vars, self.atoms[i])))
         return integral
 
     def normalize(self):
         Z = float(sum(self.weights))
-        for i in xrange(len(self.weights)):
+        for i in range(len(self.weights)):
             self.weights[i] = self.weights[i] / Z
     
     def __add__(self, other):
@@ -231,8 +231,8 @@ class MomentMatrix(object):
         return Anp, bnp
     
     def get_Ab_slack(self, constraints=None, abs_slack=1e-2, rel_slack=1e-2, slackvector=0):
-        print 'slacks'
-        print abs_slack
+        print('slacks')
+        print(abs_slack)
         num_constrs = len(constraints) if constraints is not None else 0
         Anp = np.zeros((num_constrs, self.num_matrix_monos))
         bnp = np.zeros((num_constrs,1))
@@ -284,7 +284,7 @@ class MomentMatrix(object):
         print the moment matrix in a nice format?
         """
         for i,mono in enumerate(self.matrix_monos):
-            print '%s:\t%f\t' % (str(mono), sol['x'][i])
+            print('%s:\t%f\t' % (str(mono), sol['x'][i]))
 
 
 class LocalizingMatrix(object):
@@ -345,7 +345,7 @@ class LocalizingMatrix(object):
 if __name__=='__main__':
     # simple test to make sure things run
     from cvxopt import solvers
-    print 'testing simple unimixture with a skipped observation, just to test that things run'
+    print('testing simple unimixture with a skipped observation, just to test that things run')
     x = sp.symbols('x')
     M = MomentMatrix(3, [x], morder='grevlex')
     constrs = [x-1.5, x**2-2.5, x**4-8.5]

@@ -18,15 +18,15 @@ import scipy as sc
 import ipdb
 import itertools
 
-from core import MomentMatrix
-from core import LocalizingMatrix
+from .core import MomentMatrix
+from .core import LocalizingMatrix
 
 _debug_mmsolvers = False
 
 def monomial_filter(mono, filter='even'):
     if filter is 'even':
         if _debug_mmsolvers and not mono==1:
-            print str(mono) + ':\t' + str(all([(i%2)==0 for i in mono.as_poly().degree_list()]))
+            print(str(mono) + ':\t' + str(all([(i%2)==0 for i in mono.as_poly().degree_list()])))
         return 1 if mono==1 else int(all([i%2==0 for i in mono.as_poly().degree_list()]))
 
 def get_cvxopt_Gh(LM, sparsemat = True):
@@ -148,7 +148,7 @@ def solve_GMP(objective, gs = None, hs = None, rounds = 1, slack = 1e-6):
 
         syms.update(nf.free_symbols)
         
-    print 'the maximum degree appearing in the problem is %d' % mindeg
+    print('the maximum degree appearing in the problem is %d' % mindeg)
     #for g in constrs:
     #    print g
     
@@ -159,10 +159,10 @@ def solve_GMP(objective, gs = None, hs = None, rounds = 1, slack = 1e-6):
         MM = MomentMatrix(i, list(syms), morder='grevlex')
         soldict = solve_ith_GMP(MM, objective, constrs, hs, slack = slack)
         soldict['MM'] = MM
-        print 'status: ' + soldict['status']
+        print('status: ' + soldict['status'])
         r =  np.linalg.matrix_rank(MM.numeric_instance(soldict['x']), 1e-2)
-        print 'round=%d,\t rank=%d,\t size=%d,\t obj=%.3f'\
-            % (i-mdeg+1, r, len(MM), soldict['primal objective'])
+        print('round=%d,\t rank=%d,\t size=%d,\t obj=%.3f'\
+            % (i-mdeg+1, r, len(MM), soldict['primal objective']))
         
         objvals[i] = soldict['primal objective']
     return soldict
@@ -224,7 +224,7 @@ def solve_generalized_mom_coneqp(MM, constraints, pconstraints=None, maxiter = 1
     q = 1e-5*matrix(np.vstack( (w,np.zeros((N,1))) ))
     
     #ipdb.set_trace()
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         w = Bf.dot(W.flatten())[:,np.newaxis]
         sol = cvxsolvers.coneqp(P, q, G=Gaug, h=h, dims=dims, A=A_aug, b=b)
     sol['x'] = sol['x'][0:D]
@@ -273,7 +273,7 @@ def solve_generalized_mom_conelp(MM, constraints, W=None, absslack=1e-4, totalsl
     q = matrix(np.vstack( (w,np.zeros((N,1))) ))
     
     #ipdb.set_trace()
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         w = Bf.dot(W.flatten())[:,np.newaxis]
         sol = cvxsolvers.coneqp(P, q, G=Gaug, h=h, dims=dims, A=A_aug, b=b)
     sol['x'] = sol['x'][0:D]
@@ -290,8 +290,8 @@ def solve_W(Xstar, rank):
     Balpha = []
     numrow = Xstar.shape[0]
     lowerdiaginds = [(i,j) for (i,j) in \
-                     itertools.product(xrange(numrow), xrange(numrow)) if i>j]
-    diaginds = [i+i*numrow for i in xrange(numrow)]
+                     itertools.product(range(numrow), range(numrow)) if i>j]
+    diaginds = [i+i*numrow for i in range(numrow)]
     for i in diaginds:
         indices = [i]
         values = [-1]
@@ -307,7 +307,7 @@ def solve_W(Xstar, rank):
     Gs = [sparse(Balpha, tc='d').trans()] + [-sparse(Balpha, tc='d').trans()]
     hs = [matrix(np.zeros((numrow, numrow)))] + [matrix(np.eye(numrow))]
     A = sparse(spmatrix([1]*numrow, [0]*numrow, \
-        range(numrow), size=(1,numrow*(numrow+1)/2), tc='d'))
+        list(range(numrow)), size=(1,numrow*(numrow+1)/2), tc='d'))
     b = matrix([numrow - rank], size=(1,1), tc='d')
     
     x = [np.sum(Xstar.flatten()*matrix(Balphai)) for Balphai in Balpha]
@@ -332,7 +332,7 @@ def solve_moments_with_convexiterations(MM, constraints, maxrank = 3, slack = 1e
     #W = R.dot(R.T)
     W = np.eye(len(MM))
     tau = []
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         w = Bf.dot(W.flatten())
         #solsdp = cvxsolvers.sdp(matrix(w), Gs=cin['G'], hs=cin['h'], A=cin['A'], b=cin['b'])
         solsdp = cvxsolvers.sdp(matrix(w), Gs=cin['G'], hs=cin['h'], Gl=cin['Gl'], hl=cin['hl'])
@@ -345,13 +345,13 @@ def solve_moments_with_convexiterations(MM, constraints, maxrank = 3, slack = 1e
         tau.append(ctau)
         
     #ipdb.set_trace()
-    print tau
+    print(tau)
     return solsdp
 
 def test_mmsolvers():
     # simple test to make sure things run
     
-    print 'testing simple unimixture with a skipped observation, just to test that things run'
+    print('testing simple unimixture with a skipped observation, just to test that things run')
     x = sp.symbols('x')
     M = MomentMatrix(3, [x], morder='grevlex')
     constrs = [x-1.5, x**2-2.5, x**4-8.5]
@@ -375,13 +375,13 @@ def test_mmsolvers():
     sol = cvxsolvers.sdp(cin['c'], Gs=Gs, \
                   hs=hs, A=cin['A'], b=cin['b'])
 
-    print sol['x']
-    print abs(sol['x'][3]-4.5)
+    print(sol['x'])
+    print(abs(sol['x'][3]-4.5))
     assert(abs(sol['x'][3]-4.5) <= 1e-3)
 
-    import extractors
-    print extractors.extract_solutions_lasserre(M, sol['x'], Kmax = 2)
-    print 'true values are 1 and 2'
+    from . import extractors
+    print(extractors.extract_solutions_lasserre(M, sol['x'], Kmax = 2))
+    print('true values are 1 and 2')
     
 if __name__=='__main__':
     test_mmsolvers()
