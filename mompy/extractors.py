@@ -10,7 +10,7 @@ import scipy.linalg # for schur decomp, which np doesnt have
 import numpy.linalg # for its norm, which suits us better than scipy
 import itertools
 import ipdb
-import .util
+import util
 
 def dict_mono_to_ind(monolist):
     dict = {}
